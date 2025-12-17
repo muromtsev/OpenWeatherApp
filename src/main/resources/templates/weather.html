@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Погода в городе</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<div class="weather-container">
+    <h1>🌤️ Прогноз погоды</h1>
+
+    <form th:action="@{/weather}" method="post" class="search-form" id="weatherForm">
+        <input
+                type="text"
+                name="city"
+                th:value="${city ?: ''}"
+                placeholder="Введите название города..."
+                class="city-input"
+                required
+        >
+        <button type="submit" class="submit-btn">Узнать погоду</button>
+    </form>
+
+    <div class="loading" id="loading">Загружаем данные...</div>
+
+    <div th:if="${hasError}"
+         th:text="${errorMessage}"
+         class="error-message show">
+    </div>
+
+    <div th:if="${weather != null && !hasError}"
+         class="weather-card show">
+
+        <div class="city-header">
+            <h2 class="city-name" th:text="${city}">Город</h2>
+            <div class="timestamp" th:text="${weather.dt}">Дата и время</div>
+        </div>
+
+        <div class="temperature">
+            <span class="temp-value" th:text="${#numbers.formatInteger(weather.main.temp, 0)} + '°C'"></span>
+        </div>
+
+        <div class="weather-description"
+             th:text="${weather.weather[0].description}">
+            описание погоды
+        </div>
+
+        <div class="weather-icon" th:switch="${weather.weather[0].main}">
+            <span th:case="'Clear'">☀️</span>
+            <span th:case="'Clouds'">☁️</span>
+            <span th:case="'Rain'">🌧️</span>
+            <span th:case="'Snow'">❄️</span>
+            <span th:case="'Thunderstorm'">⛈️</span>
+            <span th:case="*">🌤️</span>
+        </div>
+
+        <div class="weather-info">
+            <div class="info-item">
+                <span class="info-label">Ощущается как</span>
+                <span class="info-value" th:text="${#numbers.formatInteger(weather.main.feels_like, 0)}+'°C'"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Скорость ветра</span>
+                <span class="info-value" th:text="${weather.wind.speed}+' м/с'">0 м/с</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Минимальная</span>
+                <span class="info-value" th:text="${#numbers.formatInteger(weather.main.temp_min, 0)}+'°C'"></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Максимальная</span>
+                <span class="info-value" th:text="${#numbers.formatInteger(weather.main.temp_max, 0)}+'°C'"></span>
+            </div>
+        </div>
+
+        <div class="sun-times">
+            <div class="sun-item sunrise">
+                <div class="sun-icon">🌅</div>
+                <div class="sun-time" th:text="${weather.sys.sunrise}">07:49</div>
+                <div class="sun-label">Восход</div>
+            </div>
+            <div class="sun-item sunset">
+                <div class="sun-icon">🌇</div>
+                <div class="sun-time" th:text="${weather.sys.sunset}">16:06</div>
+                <div class="sun-label">Закат</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/script.js}" defer></script>
+</body>
+</html>
